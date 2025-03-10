@@ -1158,7 +1158,7 @@ function updateNavbar(profile = 'https://via.placeholder.com/50') {
 // Handle navigation and logout
 function navigateTo(page) {
   const pages = {
-    dashboard: '../../Patient-Dashboard/html/dashboard.html',
+    dashboard: 'http://patient.morgphealth.com/',
     'register as doctor': '../register-doctor/index.html',
   };
   if (pages[page]) window.location.href = pages[page];
@@ -1230,116 +1230,159 @@ function logout() {
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-  const userid = localStorage.getItem('userid');
-  const navbarContent = document.getElementById('dropdown');
+  document.addEventListener("DOMContentLoaded", async function () {
+      const apiUrl = "http://localhost:4000/api/addDoc/reviewDoc";
 
-  if (!userid) {
-    console.log('User ID not found. Showing login button.');
+      // Handle Payment Method Selection
+      const paymentMethodSelect = document.getElementById("payment-method");
+      const bankDetails = document.getElementById("bank-details");
+      const paypalDetails = document.getElementById("paypal-details");
 
-    // Add Login button if no user ID
-    if (navbarContent) {
-      navbarContent.innerHTML = `
-        <button id="loginButton" class="login-btn">Login</button>
-      `;
-    }
-
-    // Add click event to redirect to login page
-    const loginButton = document.getElementById('loginButton');
-    if (loginButton) {
-      loginButton.addEventListener('click', () => {
-        window.location.href = '../auth/login.html';
+      paymentMethodSelect.addEventListener("change", function () {
+          if (this.value === "Bank") {
+              bankDetails.style.display = "block";
+              paypalDetails.style.display = "none";
+          } else if (this.value === "PayPal") {
+              paypalDetails.style.display = "block";
+              bankDetails.style.display = "none";
+          } else {
+              bankDetails.style.display = "none";
+              paypalDetails.style.display = "none";
+          }
       });
-    }
 
-    return; // Stop further execution if no user ID
-  }
+      // Prevent duplicate form submission
+      document.getElementById("doctor-registration-form").addEventListener("submit", function (e) {
+          let submitButton = document.querySelector(".default-btn");
+          if (submitButton.disabled) {
+              e.preventDefault(); // Prevent duplicate submission
+              return;
+          }
+          submitButton.disabled = true;
+          submitButton.innerText = "Submitting...";
+      });
 
-  // Fetch user data if user ID exists
-  fetchUserData(userid);
-});
+      // Fetch hospitals and populate dropdown
+      try {
+          const response = await fetch('https://morgphealth.onrender.com/api/hospitals');
+          const hospital = await response.json();
+          const hospitals = hospital.data;
 
-// Fetch and update navbar logic (if a valid user is logged in)
-async function fetchUserData(userid) {
-  try {
-    const response = await fetch(`https://morgphealth.onrender.com/api/user/get-profileId/${userid}`);
-    const data = await response.json();
+          const hospitalSelect = document.querySelector('select[name="hospitalId"]');
+          hospitals.forEach(hospital => {
+              const option = document.createElement('option');
+              option.value = hospital._id;
+              option.textContent = hospital.name;
+              hospitalSelect.appendChild(option);
+          });
+      } catch (error) {
+          console.error('❌ Error fetching hospitals:', error);
+      }
 
-    if (data?.user?.image) {
-      console.log('Fetched user image:', data.user.image);
-      updateNavbar(data.user.image);
-    } else {
-      console.log('User image not available, using default.');
-      updateNavbar(); // Use default avatar
-    }
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    updateNavbar(); // Use default avatar in case of error
-  }
-}
+      // Handle Form Submission
+      document.getElementById("doctor-registration-form").addEventListener("submit", async function (event) {
+          event.preventDefault();
 
-// Update navbar when user ID exists
-function updateNavbar(profile = 'https://via.placeholder.com/50') {
-  const navbarContent = document.getElementById('dropdown');
+          const formData = new FormData(this);
+          const paymentMethod = paymentMethodSelect.value;
+          let paymentMethods = [];
 
-  if (!navbarContent) {
-    console.error('Navbar container not found.');
-    return;
-  }
+          if (paymentMethod === "PayPal") {
+              const paypalEmail = document.querySelector('input[name="paypalEmail"]').value;
+              if (!paypalEmail) {
+                  alert("PayPal email is required!");
+                  return;
+              }
+              paymentMethods.push({
+                  method: "PayPal",
+                  details: { paypalEmail }
+              });
+          } else if (paymentMethod === "Bank") {
+              const accountHolder = document.querySelector('input[name="accountHolder"]').value;
+              const bankName = document.querySelector('input[name="bankName"]').value;
+              const bankAccount = document.querySelector('input[name="bankAccount"]').value;
+              const iban = document.querySelector('input[name="iban"]').value;
 
-  navbarContent.innerHTML = `
-    <div class="navbar">
-      <div class="relative">
-        <div class="avatar-group" id="toggleDropdown">
-          <img class="avatar" src="${profile}" alt="" />
-          <i class="fas fa-chevron-down dropdown-icon"></i>
-        </div>
-        <div class="dropdown-content hidden" id="dropdownMenu">
-          <div class="dropdown-item" onclick="navigateTo('dashboard')">Dashboard</div>
-          <div class="dropdown-item" onclick="navigateTo('register as doctor')">Register As Doctor</div>
-          <div class="dropdown-item" onclick="logout()">Logout</div>
-        </div>
-      </div>
-    </div>
-  `;
+              if (!accountHolder || !bankName || !bankAccount || !iban) {
+                  alert("All bank details are required!");
+                  return;
+              }
 
-  setupDropdown(); // Initialize dropdown functionality
-}
+              paymentMethods.push({
+                  method: "Bank",
+                  details: {
+                      accountHolder,
+                      bankName,
+                      bankAccount,
+                      iban
+                  }
+              });
+          }
 
-// Initialize dropdown behavior
-function setupDropdown() {
-  const toggleDropdown = document.getElementById('toggleDropdown');
-  const dropdownMenu = document.getElementById('dropdownMenu');
+          // Convert the object to JSON string before appending
+          formData.append("paymentMethods", JSON.stringify(paymentMethods));
 
-  if (!toggleDropdown || !dropdownMenu) return;
+          // Append image files
+          const imageFiles = ["image", "medicalLicense", "diplomaCertificates", "proofOfID"];
+          imageFiles.forEach((fieldName) => {
+              const fileInput = document.querySelector(`input[type="file"][name="${fieldName}"]`);
 
-  toggleDropdown.addEventListener('click', (event) => {
-    event.stopPropagation();
-    dropdownMenu.classList.toggle('hidden');
+              if (fileInput && fileInput.files && fileInput.files.length > 0) {
+                  formData.append(fieldName, fileInput.files[0]); // Append the actual file
+                  console.log(`✅ Appended ${fieldName}:`, formData.get(fieldName)); // Log added file
+              } else {
+                  console.warn(`⚠️ Warning: No file selected for "${fieldName}".`);
+              }
+          });
+
+          // Debug: Check everything in formData before submitting
+          for (let [key, value] of formData.entries()) {
+              console.log("📌 FormData Key:", key, "Value:", value);
+          }
+
+          // Form Submission
+          try {
+              const response = await fetch(apiUrl, {
+                  method: "POST",
+                  body: formData
+              });
+
+              console.log("📡 Response Status:", response.status, response.statusText);
+
+              if (!response.ok) {
+                  const errorText = await response.text(); // Read response as text for debugging
+                  throw new Error(`HTTP Error ${response.status}: ${errorText}`);
+              }
+
+              let data;
+              try {
+                  data = await response.json();
+              } catch (jsonError) {
+                  console.error("⚠️ Invalid JSON response:", jsonError);
+                  throw new Error("Invalid JSON response from server.");
+              }
+
+              console.log("📩 Response Data:", data);
+
+              if (data) {
+                  alert("✅ Registration successful!");
+                  window.location.href = '../status.html';
+                  console.log("✅ Success:", data);
+                  document.getElementById("doctor-registration-form").reset(); // Reset form after success
+              } else {
+                  throw new Error(data.message || "Form submission failed.");
+              }
+          } catch (error) {
+              console.error("🚨 Submission Error:", error.message || error);
+              alert("⚠️ Error submitting form! Check console for details.");
+          } finally {
+              // Re-enable submit button after submission
+              let submitButton = document.querySelector(".default-btn");
+              submitButton.disabled = false;
+              submitButton.innerText = "Submit";
+          }
+      });
   });
-
-  document.addEventListener('click', (event) => {
-    if (!toggleDropdown.contains(event.target) && !dropdownMenu.contains(event.target)) {
-      dropdownMenu.classList.add('hidden');
-    }
-  });
-}
-
-// Handle navigation and logout
-function navigateTo(page) {
-  const pages = {
-    dashboard: '../../Patient-Dashboard/html/dashboard.html',
-    'register as doctor': '../register-doctor/index.html',
-  };
-  if (pages[page]) window.location.href = pages[page];
-}
-
-function logout() {
-  localStorage.removeItem('utoken');
-  localStorage.removeItem('userid');
-  window.location.href = '../auth/login.html';
-}
-
 </script>
 
 
