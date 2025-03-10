@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login/Signup Form</title>
+    <link rel="stylesheet" href="login.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="container">
+        <div class="form-box login">
+            <form action="#">
+                <h1>Login</h1>
+                <div class="input-box">
+                    <input type="text" placeholder="email" required>
+                    <i class='bx bxs-user'></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" placeholder="Password" required>
+                    <i class='bx bxs-lock-alt' ></i>
+                </div>
+                <div class="forgot-link">
+                    <a href="#">Forgot Password?</a>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <p>or login with social platforms</p>
+                <!-- <div class="social-icons">
+                    <a href="#"><i class='bx bxl-google' ></i></a>
+                    <a href="#"><i class='bx bxl-facebook' ></i></a>
+                    <a href="#"><i class='bx bxl-github' ></i></a>
+                    <a href="#"><i class='bx bxl-linkedin' ></i></a>
+                </div> -->
+            </form>
+        </div>
+
+        <div class="form-box register">
+            <form action="#">
+                <h1>Registration</h1>
+                <div class="input-box">
+                    <input type="text" placeholder="name" required>
+                    <i class='bx bxs-user'></i>
+                </div>
+                <div class="input-box">
+                    <input type="email" placeholder="Email" required>
+                    <i class='bx bxs-envelope' ></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" placeholder="Password" required>
+                    <i class='bx bxs-lock-alt' ></i>
+                </div>
+                <button type="submit" class="btn">Register</button>
+                <p>or register with social platforms</p>
+                <!-- <div class="social-icons">
+                    <a href="#"><i class='bx bxl-google' ></i></a>
+                    <a href="#"><i class='bx bxl-facebook' ></i></a>
+                    <a href="#"><i class='bx bxl-github' ></i></a>
+                    <a href="#"><i class='bx bxl-linkedin' ></i></a>
+                </div> -->
+            </form>
+        </div>
+
+        <div class="toggle-box">
+            <div class="toggle-panel toggle-left">
+                <h1>Hello, Welcome!</h1>
+                <p>Don't have an account?</p>
+                <button class="btn register-btn">Register</button>
+            </div>
+
+            <div class="toggle-panel toggle-right">
+                <h1>Welcome Back!</h1>
+                <p>Already have an account?</p>
+                <button class="btn login-btn">Login</button>
+            </div>
+        </div>
+    </div>
+
+   
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.querySelector('.container');
+        const registerBtn = document.querySelector('.register-btn');
+        const loginBtn = document.querySelector('.login-btn');
+        const loginForm = document.querySelector('.form-box.login form');
+        const registerForm = document.querySelector('.form-box.register form');
+        
+        // Show login form when 'Login' button is clicked
+        loginBtn.addEventListener('click', () => {
+            container.classList.remove('active');
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        });
+
+        // Show register form when 'Register' button is clicked
+        registerBtn.addEventListener('click', () => {
+            container.classList.add('active');
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        });
+
+        // Handle Login form submission
+        loginForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const email = loginForm.querySelector('input[type="text"]').value;
+    const password = loginForm.querySelector('input[type="password"]').value;
+
+    const backendUrl = "https://morgphealth.onrender.com";
+
+    axios
+        .post(`${backendUrl}/api/user/login`, { email, password })
+        .then((response) => {
+            const data = response.data;
+            if (data.success) {
+                localStorage.setItem("utoken", data.token);
+                localStorage.setItem("insured", data.insured);
+                localStorage.setItem("userId", data.userid); // User prefers 'userid'
+                alert("Login successful! Check your email for a login notification.");
+                window.location.href = "../index.html"; // Redirect to homepage
+            } else {
+                console.error(data.message); // Handle error message
+            }
+        })
+        .catch((error) => {
+            console.error("Error during login:", error); // Log any error that occurs
+        });
+});
+
+
+        // Handle Signup form submission
+        registerForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const name = registerForm.querySelector('input[type="text"]').value;
+    const email = registerForm.querySelector('input[type="email"]').value;
+    const password = registerForm.querySelector('input[type="password"]').value;
+
+    const backendUrl = "https://morgphealth.onrender.com";
+
+    axios
+        .post(`${backendUrl}/api/user/register`, { name, email, password })
+        .then((response) => {
+            const data = response.data;
+            if (data.success) {
+                localStorage.setItem("utoken", data.token);
+                localStorage.setItem("insured", data.insured);
+                localStorage.setItem("userid", data.userid); // User prefers 'userid'
+                alert("Registration successful! Check your email for confirmation.");
+                window.location.href = "../home/index.html"; // Redirect to homepage
+            } else {
+                console.error(data.message); // Handle error message
+            }
+        })
+        .catch((error) => {
+            console.error("Error during sign-up:", error); // Log any error that occurs
+        });
+});
+
+    });
+</script>
+
+  
+</body>
+</html>

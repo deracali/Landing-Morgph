@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Pending Page</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(0, 123, 255, 0.3);
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .hospital-logo {
+            width: 80px;
+            margin-bottom: 15px;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: bold;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://cdn-icons-png.flaticon.com/512/2977/2977575.png" alt="Hospital Logo" class="hospital-logo">
+        <div class="spinner"></div>
+        <h2>Processing Request</h2>
+        <p>Your appointment request is being processed. Please wait a moment.</p>
+    </div>
+
+
+
+
+    <script>
+        async function checkEmailAndUpdateContent(doctorEmail, doctorId) {
+            try {
+                // Get the container element
+                const container = document.querySelector('.container');
+    
+                // First, check if the email exists in the doctors' database
+                const emailResponse = await fetch(`https://morgphealth.onrender.com/api/admin/all-doctors`, {
+                    method: 'POST',
+                });
+    
+                const emailData = await emailResponse.json();
+    
+                // Check if the email exists
+                const doctorExists = emailData.doctors && emailData.doctors.some(doctor => doctor.email === doctorEmail);
+                
+                if (doctorExists) {
+                    // If the email exists, update content to "Accepted"
+                    container.innerHTML = `
+                        <img src="https://cdn-icons-png.flaticon.com/512/2977/2977575.png" alt="Hospital Logo" class="hospital-logo">
+                        <h2>Request Accepted</h2>
+                        <p>Your appointment request has been accepted. You can now view your appointment details in the dashboard.</p>
+                        <button class="button" onclick="window.location.href='/dashboard.html'">Go to Dashboard</button>
+                    `;
+                    
+                    // Now, check the doctor's cancellation status only if the email is valid
+                    const doctorResponse = await fetch(`https://morgphealth.onrender.com/api/addDoc/review-docs/${doctorId}`, {
+                        method: 'GET',
+                    });
+    
+                    const doctorData = await doctorResponse.json();
+    
+                    // If the doctor has cancelled the appointment (assuming 'cancelled' is a field)
+                    if (doctorData.reviewDoc && doctorData.reviewDoc.cancelled && doctorData.reviewDoc.cancelled === true) {
+                        // If cancelled is true, update content accordingly
+                        container.innerHTML = `
+                            <img src="https://cdn-icons-png.flaticon.com/512/2977/2977575.png" alt="Hospital Logo" class="hospital-logo">
+                            <h2>Appointment Cancelled</h2>
+                            <p>Unfortunately, the appointment has been cancelled. Please contact the hospital for more details.</p>
+                        `;
+                    }
+                } else {
+                    // If the email doesn't exist, show "Doctor Not Found" error
+                    container.innerHTML = `
+                        <img src="https://cdn-icons-png.flaticon.com/512/2977/2977575.png" alt="Hospital Logo" class="hospital-logo">
+                        <h2>Doctor Not Found</h2>
+                        <p>We couldn't find a doctor with that email. Please check the email and try again.</p>
+                    `;
+                }
+            } catch (error) {
+                console.error("Error checking data:", error);
+                // Handle any errors, perhaps by showing an error message
+                const container = document.querySelector('.container');
+                container.innerHTML = `
+                    <h2>Error</h2>
+                    <p>There was an issue processing your request. Please try again later.</p>
+                `;
+            }
+        }
+    
+        // Get the email and id from the URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const doctorEmail = urlParams.get('email');
+        const doctorId = urlParams.get('id');
+    
+        if (doctorEmail && doctorId) {
+            // Call the function to check the email and doctorId, and update content accordingly
+            checkEmailAndUpdateContent(doctorEmail, doctorId);
+        } else {
+            console.error("Email or Doctor ID parameter is missing");
+        }
+    </script>
+    
+    
+    
+    
+</body>
+</html>

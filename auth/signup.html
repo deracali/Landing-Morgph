@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up Webpage</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <form id="authForm" class="sign-up">
+            <h1 id="formTitle" class="heading"></h1>
+            <p id="formSubtitle" class="conditions"></p>
+
+            <div id="nameField" class="text">
+                <img src="https://i.postimg.cc/1zgS8WTF/user.png" alt="icon" height="20">
+                <input id="nameInput" type="text" placeholder="Name">
+            </div>
+
+            <div class="text">
+                <img src="https://i.postimg.cc/DZBPRgvC/email.png" alt="icon" height="12">
+                <input id="emailInput" type="email" placeholder="Email">
+            </div>
+
+            <div class="text">
+                <img src="https://i.postimg.cc/Nj5SDK4q/password.png" alt="icon" height="20">
+                <input id="passwordInput" type="password" placeholder="Password">
+            </div>
+
+            <div class="text">
+                <img src="https://i.postimg.cc/Nj5SDK4q/password.png" alt="icon" height="20">
+                <input id="repeatPasswordInput" type="password" placeholder="Repeat Password">
+            </div>
+
+           
+
+            <button id="submitButton" type="submit">CREATE ACCOUNT</button>
+            <p class="conditions">Already have an account? <a href="#">Sign in</a></p>
+        </form>
+
+        <div class="text-container">
+            <h1>Glad to see you!</h1>
+            <p>Welcome, please fill in the blanks for sign up</p>
+        </div>
+    </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const authForm = document.getElementById('authForm');
+            const formTitle = document.getElementById('formTitle');
+            const formSubtitle = document.getElementById('formSubtitle');
+            const nameField = document.getElementById('nameField');
+            const submitButton = document.getElementById('submitButton');
+
+            // Initial setup for Signup
+            formTitle.textContent = 'Create Account';
+            formSubtitle.textContent = 'Please sign up to book an appointment';
+            nameField.style.display = 'block';
+            submitButton.textContent = 'Create Account';
+
+            authForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const name = document.getElementById('nameInput').value;
+                const email = document.getElementById('emailInput').value;
+                const password = document.getElementById('passwordInput').value;
+
+                const backendUrl = 'https://morgphealth.onrender.com/'; // Replace with your actual backend URL
+                axios.post(`${backendUrl}api/user/register`, { name, email, password })
+                    .then(response => {
+                        const data = response.data;
+                        if (data.success) {
+                            localStorage.setItem('utoken', data.token);
+                            localStorage.setItem('insured', data.insured);
+                            localStorage.setItem('userid', data.userId);  // User prefers 'userid'
+                            window.location.href = '../home/index.html';  // Redirect to homepage
+                        } else {
+                            console.error(data.message);  // Handle error message
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error during sign up:', error);  // Log any error that occurs
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
+
+document.addEventListener('DOMContentLoaded', () => {
+    const authForm = document.getElementById('authForm');
+    const formTitle = document.getElementById('formTitle');
+    const formSubtitle = document.getElementById('formSubtitle');
+    const nameField = document.getElementById('nameField');
+    const submitButton = document.getElementById('submitButton');
+    
+    // Initial setup for Login
+    formTitle.textContent = 'Login';
+    formSubtitle.textContent = 'Please login to book an appointment';
+    nameField.style.display = 'none';  // Hide the name input for login
+    submitButton.textContent = 'Login';
+  
+    authForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const email = document.getElementById('emailInput').value;
+      const password = document.getElementById('passwordInput').value;
+  
+      const backendUrl = 'YOUR_BACKEND_URL_HERE'; // Replace with your actual backend URL
+      axios.post(`${backendUrl}api/user/login`, { email, password })
+        .then(response => {
+          const data = response.data;
+          if (data.success) {
+            localStorage.setItem('utoken', data.token);
+            localStorage.setItem('insured', data.insured);
+            localStorage.setItem('userid', data.userId);  // User prefers 'userid'
+            window.location.href = '/';  // Redirect to homepage
+          } else {
+            console.error(data.message);  // Handle error message
+          }
+        })
+        .catch(error => {
+          console.error('Error during login:', error);  // Log any error that occurs
+        });
+    });
+  });
+
+  
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const authForm = document.getElementById('authForm');
+    const formTitle = document.getElementById('formTitle');
+    const formSubtitle = document.getElementById('formSubtitle');
+    const nameField = document.getElementById('nameField');
+    const submitButton = document.getElementById('submitButton');
+    
+    // Initial setup for Signup
+    formTitle.textContent = 'Create Account';
+    formSubtitle.textContent = 'Please sign up to book an appointment';
+    nameField.style.display = 'block';
+    submitButton.textContent = 'Create Account';
+  
+    authForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = document.getElementById('nameInput').value;
+      const email = document.getElementById('emailInput').value;
+      const password = document.getElementById('passwordInput').value;
+  
+      const backendUrl = 'YOUR_BACKEND_URL_HERE'; // Replace with your actual backend URL
+      axios.post(`${backendUrl}api/user/register`, { name, email, password })
+        .then(response => {
+          const data = response.data;
+          if (data.success) {
+            localStorage.setItem('utoken', data.token);
+            localStorage.setItem('insured', data.insured);
+            localStorage.setItem('userid', data.userId);  // User prefers 'userid'
+            window.location.href = '/';  // Redirect to homepage
+          } else {
+            console.error(data.message);  // Handle error message
+          }
+        })
+        .catch(error => {
+          console.error('Error during sign up:', error);  // Log any error that occurs
+        });
+    });
+  });
+  
