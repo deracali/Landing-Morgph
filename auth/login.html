@@ -114,7 +114,7 @@
             if (data.success) {
                 localStorage.setItem("utoken", data.token);
                 localStorage.setItem("insured", data.insured);
-                localStorage.setItem("userId", data.userid); // User prefers 'userid'
+                localStorage.setItem("userId", data.userId); // User prefers 'userid'
                 alert("Login successful! Check your email for a login notification.");
                 window.location.href = "../index.html"; // Redirect to homepage
             } else {
@@ -143,9 +143,9 @@
             if (data.success) {
                 localStorage.setItem("utoken", data.token);
                 localStorage.setItem("insured", data.insured);
-                localStorage.setItem("userid", data.userid); // User prefers 'userid'
+                localStorage.setItem("userId", data.userId); // User prefers 'userid'
                 alert("Registration successful! Check your email for confirmation.");
-                window.location.href = "../home/index.html"; // Redirect to homepage
+                window.location.href = "../index.html"; // Redirect to homepage
             } else {
                 console.error(data.message); // Handle error message
             }
