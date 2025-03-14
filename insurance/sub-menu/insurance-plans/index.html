@@ -307,11 +307,11 @@ Learn More <i class="ti ti-arrow-right icon"></i></a></p>						</div>
 <div class="collapse navbar-collapse">
      <div class="menu-top-menu-container">
         <ul id="menu-top-menu" class="top-navbar-list align-items-center">
-            <li id="dashboard"><a href="#" onclick="navigateTo('dashboard')">Dashboard</a></li>
+          <li id="dashboard"><a href="#" onclick="navigateTo('dashboard')">Dashboard</a></li>
             <li id="menu-item-762" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-762"><a href="../../../register-doctor/index.html">Register as a Doctor</a></li>
-            <li id="menu-item-762" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-762"><a href="home/top-menu/online-services/index.html">Online Services</a></li>
-            <li id="menu-item-761" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-761"><a href="home/top-menu/health-professionals/index.html">Health Professionals</a></li>
-            <li id="menu-item-763" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-763"><a href="home/top-menu/contact-us/index.html">Contact Us</a></li>
+            <li id="menu-item-762" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-762"><a href="../../../home/top-menu/online-services/index.html">Online Services</a></li>
+            <li id="menu-item-761" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-761"><a href="../../../home/top-menu/health-professionals/index.html">Health Professionals</a></li>
+            <li id="menu-item-763" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-763"><a href="../../../home/top-menu/contact-us/index.html">Contact Us</a></li>
             <li id="logout" class="login-btn"><a href="#" style="color: white;" onclick="logout()">Logout</a></li>
 <div id="dropdown" class="end">
     <div class="relative">
@@ -501,13 +501,17 @@ Learn More <i class="ti ti-arrow-right icon"></i></a></p>						</div>
             <div class="card card-body">
                 <div class="menu-top-menu-container">
                     <ul id="menu-top-menu-1" class="top-navbar-list">
-                        <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-762"><a href="register-doctor/index.html">Register as a Doctor</a></li>
+                        <li id="mobile-docregister" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-762"><a href="../../../register-doctor/index.html">Register as a Doctor</a></li>
                         <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-762"><a href="home/top-menu/online-services/index.html">Online Services</a></li>
                        <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-761"><a href="home/top-menu/health-professionals/index.html">Health Professionals</a></li>
                        <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-763"><a href="home/top-menu/contact-us/index.html">Contact Us</a></li>
                        <li id="mobile-dashboard"><a href="#" onclick="navigateTo('dashboard')">Dashboard</a></li>
-                       <li id="mobile-login" class="login-btn"><a href="auth/login.html" style="color: white;">Login</a></li>
-                           <li id="mobile-logout"><a href="#" style="color: white;" onclick="logout()">Logout</a></li>
+                       <li id="mobile-doc-dashboard" style="display: none;">
+                           <a href="https://doctor.morgphealth.com/dashboard.html">Doctor Dashboard</a>
+                       </li>
+                       <li id="mobile-login" class="login-btn"><a href="../../../auth/login.html" style="color: white;">Patient</a></li>
+                       <li id="mobile-docLogin" style="margin-left:10px;" class="login-btn"><a href="../../../auth/doclogin.html" style="color: white;" >Doctor</a></li>  
+                       <li id="mobile-logout" class="login-btn"><a href="#" style="color: white;" onclick="logout()">Logout</a></li>
                    </ul></div>                                </div>
         </div>
     </div>
@@ -1033,8 +1037,14 @@ var elementorFrontendConfig = {"environmentMode":{"edit":false,"wpPreview":false
     // Add Login button if no user ID
     if (navbarContent) {
       navbarContent.innerHTML = `
-        <button id="loginButton" class="login-btn">Login</button>
+        <button id="loginButton" class="login-btn">Patient</button>
+         <li id="docLogin" style="margin-left:10px;" class="login-btn"><a href="../../../auth/doclogin.html" style="color: white;" >Doctor</a></li>
       `;
+    }
+
+    if (localStorage.getItem("doctorId")) {
+        document.getElementById("docLogin").style.display = "none";
+        document.getElementById("loginButton").style.display = "none";
     }
 
     // Add click event to redirect to login page
@@ -1106,7 +1116,8 @@ function navigateTo(page) {
 function logout() {
   localStorage.removeItem('utoken');
   localStorage.removeItem('userId');
-  window.location.href = '../../../auth/login.html';
+    localStorage.removeItem('token'); localStorage.removeItem('doctorId');
+  window.location.href = 'index.html';
 }
 
 </script>
@@ -1127,6 +1138,26 @@ function logout() {
     }
 </script>
 
+
+<script>
+    if (!localStorage.getItem('doctorId')) {
+        document.getElementById("dashboard").style.display = "none";
+        document.getElementById("logout").style.display = "none";
+        document.getElementById("mobile-login").style.display = "block";
+        document.getElementById("mobile-dashboard").style.display = "none";
+        document.getElementById("mobile-logout").style.display = "none";
+    }
+    else if(localStorage.getItem('doctorId')){
+        document.getElementById("mobile-login").style.display = "none";
+        document.getElementById("mobile-docLogin").style.display = "none";
+        document.getElementById("mobile-logout").style.display = "block";
+        document.getElementById("logout").style.display = "block";
+        document.getElementById("mobile-doc-dashboard").style.display = "block";
+            document.getElementById("doctor-dashboard").style.display = "block";
+            document.getElementById("menu-item-764").style.display = "none";
+            document.getElementById("mobile-docregister").style.display = "none";
+    }
+</script>
 
 <script>
     document.addEventListener("DOMContentLoaded", async function () {
