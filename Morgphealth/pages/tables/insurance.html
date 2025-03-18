@@ -314,15 +314,25 @@
                   </h4>
                   <div class="table-responsive">
                     <table class="table">
+                      <thead>
+                        <tr>
+                         
+                          <th>Profile</th>
+                          <th>Name</th>
+                          <th>Status</th>
+                          <th>Price</th>
+                          <th>Total Price</th>
+                          <th>Self Dob</th>
+                          <th>Spouse Dob</th>
+                          <th>Child Dob</th>
+                          <th>Mother Dob</th>
+                          <th>Father Dob</th>
+                          <th>Date</th>
+                        </tr>
+                      </thead>
                       <tbody>
                         <tr>
-                          <td>
-                            <div class="form-check">
-                              <label class="form-check-label">
-                                <input type="checkbox" class="form-check-input">
-                              </label>
-                            </div>
-                          </td>
+                         
                           <td class="py-1">
                             <!-- <img src="images/faces/face13.jpg" alt="profile" class="img-sm rounded-circle"/> -->
                           </td>
@@ -335,9 +345,7 @@
                           <td>
 
                           </td>
-                          <td>
-                            <i class="fas fa-ellipsis-v"></i>
-                          </td>
+                        
                         </tr>
                         <tr>
                           <td>
@@ -515,7 +523,7 @@ window.onload = () => {
   const staffId = localStorage.getItem('staffId');
   const currentPage = window.location.pathname.split('/').pop();
   
-  console.log("Token:", token, "Staff ID:", staffId, "Current Page:", currentPage);
+
 
   if (!token || !staffId) {
     if (currentPage !== 'index.html') {
@@ -740,39 +748,43 @@ window.onload = () => {
 
         // Add rows dynamically
         insuranceData.forEach((insurance) => {
-          const { name, planType, price, totalPrice, createdAt } = insurance;
+          const { name, planType, price, totalPrice, age, spouseAge, childAge, motherAge, fatherAge, createdAt } = insurance;
 
           const row = `
           <tr>
-            <td>
-              <div class="form-check">
-                <label class="form-check-label">
-                  <input type="checkbox" class="form-check-input">
-                </label>
-              </div>
-            </td>
+           
             <td class="py-1">
               <div class="img-sm rounded-circle bg-primary profile-image-text">${name ? name.charAt(0).toUpperCase() : '?'}</div>
             </td>
             <td class="font-weight-bold">
               ${name || 'Unknown'}
             </td>
+          
             <td>
-              <label class="badge badge-light badge-pill">${planType}</label>
+              ${planType ? `${planType}` : 'N/A'}
             </td>
+            
             <td>
               ${price ? `$${price}` : 'N/A'}
             </td>
-           
+            
             <td>
               ${totalPrice ? `$${totalPrice}` : 'N/A'}
-            </td>
-            <td>
+              </td>
+            
+              <td>${age}</td>
+            
+                 <td>${spouseAge}</td>
+              
+                <td>${childAge}</td>
+               
+                  <td>${motherAge}</td>
+                
+                <td>${fatherAge}</td>
+                <td>
               ${new Date(createdAt).toLocaleDateString()}
             </td>
-            <td>
-              <i class="fas fa-ellipsis-v"></i>
-            </td>
+           
           </tr>
         `;
 
