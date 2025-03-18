@@ -38,6 +38,9 @@
         .space {
             background-color: white;
         }
+        .input-group{
+          flex-wrap: nowrap;
+        }
 </style>
 <body>
   <div class="container-scroller">
@@ -71,7 +74,14 @@
                         <i class="fa fa-lock text-primary"></i>
                       </span>
                     </div>
-                    <input type="password" class="form-control form-control-lg border-left-0" id="exampleInputPassword" placeholder="Password" required>
+                    <div class="input-group">
+                      <input type="password" class="form-control form-control-lg border-left-0" id="exampleInputPassword" placeholder="Password" required>
+                      <div class="input-group-append">
+                        <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
+                          👁️
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div id="errorMessage" class="text-danger my-2"></div>
@@ -145,7 +155,7 @@
       } finally {
         // Hide the spinner and show the button text after form submission
         spinner.style.display = 'none';
-        buttonText.style.display = 'inline'; // Show the button text again
+        buttonText.style.display = 'block'; // Show the button text again
       }
     });
   
@@ -168,6 +178,18 @@
 
 
   
+
+  <script>
+    function togglePassword() {
+      var passwordInput = document.getElementById("exampleInputPassword");
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+      } else {
+        passwordInput.type = "password";
+      }
+    }
+  </script>
+
 
   
   <!-- plugins:js -->

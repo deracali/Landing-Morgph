@@ -75,7 +75,7 @@
 
     <div class="container">
         <div class="header">
-            Piqua Ohio Review Request Form
+            Review Request Form
         </div>
 
 
@@ -334,61 +334,81 @@ if (doctor.diplomaCertificates) {
 
 
 document.getElementById('accept-doctor-button').addEventListener('click', () => {
-            // Prepare the payload object using form values and the data from the DB
-            const payload = {
-    name: doctor.name || null,
-    email: doctor.email || '',
-    password: doctor.password || '',
-    image: doctor.image || '',
-    speciality: doctor.speciality || '',  // Access from the doctor object
-    degree: doctor.degree || '',  // Access from the doctor object
-    experience: doctor.experience || null,
-    gender: doctor.gender || '',  // Access from the doctor object
-    about: doctor.about || '',
-    available: doctor.available || true,
-    fees: doctor.fees || null,
-    balance: doctor.balance || 0,
-    address: doctor.address || '',  // Access from the doctor object
-    docaddress: doctor.docaddress || '',  // Access from the doctor object
-    region: doctor.region || '',  // Access from the doctor object
-    age: doctor.age || null,  // Access from the doctor object
-    universityName: doctor.universityName || '',  // Access from the doctor object
-    universityCountry: doctor.universityCountry || '',  // Access from the doctor object
-    medicalCouncilName: doctor.medicalCouncilName || '',  // Access from the doctor object
-    medicalCouncilCountry: doctor.medicalCouncilCountry || '',  // Access from the doctor object
-    graduationYear: doctor.graduationYear || '',  // Access from the doctor object
-    medicalLicense: doctor.medicalLicense || null,
-    diplomaCertificates: doctor.diplomaCertificates || null,
-    proofOfID: doctor.proofOfID || '',
-    paymentMethods: doctor.paymentMethods || [],  // Access from the doctor object
-    hospital: doctor.hospital || null,  // Access from the doctor object
-    services: doctor.services || []  // Access from the doctor object
-};
+    // Prepare the payload object using form values and the data from the DB
+    const cleanedEmail = doctor.email.replace(/\\/g, '');
+    const cleanedName = doctor.name ? doctor.name.replace(/\\/g, '') : '';
+    const formData = new FormData();
 
+    // Append text fields to FormData
+    formData.append('name', cleanedName || null);
+    formData.append('email', cleanedEmail || '');
+    formData.append('password', doctor.password || '');
+    formData.append('speciality', doctor.speciality || '');
+    formData.append('degree', doctor.degree || '');
+    formData.append('experience', doctor.experience || null);
+    formData.append('gender', doctor.gender || '');
+    formData.append('about', doctor.about || '');
+    formData.append('available', doctor.available || true);
+    
 
+   // Ensure fees is sent as an empty string if null
+   formData.append('fees', doctor.fees != null ? doctor.fees : '');
 
-            // Send the data to the server
-            fetch('https://morgphealth.onrender.com/api/admin/add-doctor', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    displaySuccessPopup()
-                } else {
-                    displayFailedPopup()
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                displayFailedPopup();
-            });
+// Ensure age is sent as an empty string if null
+formData.append('age', doctor.age != null ? doctor.age : '');
 
-        })
+    formData.append('balance', doctor.balance || 0);
+    formData.append('address', doctor.address || '');
+    formData.append('docaddress', doctor.docaddress || '');
+    formData.append('region', doctor.region || '');
+    formData.append('universityName', doctor.universityName || '');
+    formData.append('universityCountry', doctor.universityCountry || '');
+    formData.append('medicalCouncilName', doctor.medicalCouncilName || '');
+    formData.append('medicalCouncilCountry', doctor.medicalCouncilCountry || '');
+    formData.append('graduationYear', doctor.graduationYear || '');
+    formData.append('medicalLicense', doctor.medicalLicense || null);
+    formData.append('diplomaCertificates', doctor.diplomaCertificates || null);
+    formData.append('proofOfID', doctor.proofOfID || '');
+
+    // Append services as an array (not stringified) if it's not empty
+    if (Array.isArray(doctor.services) && doctor.services.length > 0) {
+        doctor.services.forEach((service, index) => {
+            formData.append(`services[${index}][name]`, service.name || '');
+            formData.append(`services[${index}][fee]`, service.fee || 0);
+            formData.append(`services[${index}][time]`, service.time || '');
+            formData.append(`services[${index}][category]`, service.category || '');
+        });
+    }
+
+    // Check if the file input element exists and the file is selected
+    const fileInput = document.querySelector('input[type="file"]');
+    if (fileInput && fileInput.files.length > 0) {
+        const imageFile = fileInput.files[0];
+        formData.append('image', imageFile);
+    }
+
+    // Append other optional fields
+    formData.append('paymentMethods', JSON.stringify(doctor.paymentMethods || []));
+    formData.append('hospitalId', doctor.hospital || null);
+
+    // Send the data to the server using multipart/form-data
+    fetch('https://morgphealth.onrender.com/api/admin/add-doctor', {
+        method: 'POST',
+        body: formData // Directly pass the FormData object
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displaySuccessPopup();
+        } else {
+            displayFailedPopup(data.message || 'Doctor could not be added.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        displayFailedPopup(error.message || 'An error occurred while processing the request.');
+    });
+});
 
 
 // Function to display the custom success popup with overlay
@@ -410,20 +430,20 @@ function displaySuccessPopup() {
   overlay.style.display = 'block';  // Show overlay
 }
 // Function to display the custom success popup with overlay
-function displayFailedPopup() {
-  const successPopup = `
+function displayFailedPopup(errorMessage) {
+  const failedPopup = `
     <div class="wrapper text-center">
       <h4 class="card-title">Failed To Add Doctor</h4>
-      <p class="card-description">Missing Email and Password !</p>
+      <p class="card-description">${errorMessage || 'An error occurred while adding the doctor.'}</p>
       <button class="btn btn-outline-red" onclick="closePopup()">Close</button>
     </div>
   `;
   
-  // Insert the success popup into the DOM
+  // Insert the failed popup into the DOM
   const popupContainer = document.getElementById('popup-container');
   const overlay = document.getElementById('popup-overlay');
   
-  popupContainer.innerHTML = successPopup;
+  popupContainer.innerHTML = failedPopup;
   popupContainer.style.display = 'block';  // Show popup
   overlay.style.display = 'block';  // Show overlay
 }

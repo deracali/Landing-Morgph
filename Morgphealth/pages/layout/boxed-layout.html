@@ -854,15 +854,22 @@
     <!-- page-body-wrapper ends -->
   </div>
   <!-- container-scroller -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const token = localStorage.getItem('authToken'); // Get the auth token from local storage
+    <script>
 
-      if (!token) {
-        // Redirect to login page if there is no token
-        window.location.href = 'index.html'; // Replace 'login.html' with the URL you want to redirect to
-      }
-    });
+window.onload = () => {
+  const token = localStorage.getItem('authToken');
+  const staffId = localStorage.getItem('staffId');
+  const currentPage = window.location.pathname.split('/').pop();
+  
+  console.log("Token:", token, "Staff ID:", staffId, "Current Page:", currentPage);
+
+  if (!token || !staffId) {
+    if (currentPage !== 'index.html') {
+      window.location.href = 'index.html';
+    }
+  }
+};
+
   </script>
   <script>
     // Get DOM elements

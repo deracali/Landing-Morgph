@@ -392,15 +392,22 @@
     <!-- page-body-wrapper ends -->
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const token = localStorage.getItem('authToken'); // Get the auth token from local storage
+   <script>
+
+window.onload = () => {
+  const token = localStorage.getItem('authToken');
+  const staffId = localStorage.getItem('staffId');
+  const currentPage = window.location.pathname.split('/').pop();
   
-      if (!token) {
-        // Redirect to login page if there is no token
-        window.location.href = 'index.html'; // Replace 'login.html' with the URL you want to redirect to
-      }
-    });
+  console.log("Token:", token, "Staff ID:", staffId, "Current Page:", currentPage);
+
+  if (!token || !staffId) {
+    if (currentPage !== 'index.html') {
+      window.location.href = 'index.html';
+    }
+  }
+};
+
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -679,7 +686,10 @@
   fetch(apiUrl)
       .then(response => response.json())
       .then(data => {
-          renderDoctors(data.reviewDocs);
+        const sortedDocs = data.reviewDocs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+// Render doctors with the sorted data
+renderDoctors(sortedDocs);
       })
       .catch(error => console.error('Error fetching data:', error));
 
