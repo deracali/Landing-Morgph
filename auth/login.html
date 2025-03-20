@@ -115,7 +115,6 @@
                 localStorage.setItem("utoken", data.token);
                 localStorage.setItem("insured", data.insured);
                 localStorage.setItem("userId", data.userId); // User prefers 'userid'
-                alert("Login successful! Check your email for a login notification.");
                 window.location.href = "../index.html"; // Redirect to homepage
             } else {
                 console.error(data.message); // Handle error message

@@ -377,14 +377,13 @@ Learn More <i class="ti ti-arrow-right icon"></i></a></p>						</div>
     <div class="elementor-element elementor-element-dbe12f1 elementor-widget elementor-widget-HospaButton" data-id="dbe12f1" data-element_type="widget" data-widget_type="HospaButton.default">
 <div class="elementor-widget-container">
 
-  <div id="appointment-btn" class="text-end">
-    <a href="https://patient.morgphealth.com/html/booking.html" 
-       class="hospa-button top-header-btn flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
-        <i class="ti ti-calendar-plus"></i>
-        Request An Appointment
-    </a>
-</div>
-
+   <div id="appointment-btn" class="hospa-button top-header-btn text-end">
+        <a href="../../../Patient-Dashboard/html/booking.html" 
+           class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+            <i class="ti ti-calendar-plus"></i>
+            Request An Appointment
+        </a>
+    </div>
 </div>
 </div>
 </div>
@@ -1188,7 +1187,7 @@ navbarContent.innerHTML = `
 // Handle navigation and logout
 function navigateTo(page) {
 const pages = {
-  dashboard: '../../https://patient.morgphealth.com/html/dashboard.html',
+  dashboard: '../../../Patient-Dashboard/html/dashboard.html',
   'register as doctor': '../../../register-doctor/index.html',
 };
 if (pages[page]) window.location.href = pages[page];
